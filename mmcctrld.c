@@ -92,11 +92,24 @@ void handle_fpga_ctrl(const mb_fpga_ctrl_t* ctrl)
 int main()
 {
     daemonize();
-    syslog(LOG_NOTICE, "Started");
+
+    {
+        const char *adap, *bus, *eeprom;
+        if ((adap = mb_get_adapter_name()) != NULL && (bus = mb_get_bus_name()) != NULL &&
+            (eeprom = mb_get_eeprom_path()) != NULL) {
+            syslog(LOG_NOTICE, "Found adapter '%s' at %s", adap, bus);
+            syslog(LOG_NOTICE, "Using device file %s", eeprom);
+        } else {
+            syslog(LOG_ERR, "Could not open mailbox");
+            goto finish;
+        }
+    }
 
     const struct timespec ts_poll = {
         .tv_nsec = POLL_INTERVAL_MS * 1e6,
     };
+
+    syslog(LOG_NOTICE, "Started");
 
     while (!terminate) {
         mb_fpga_ctrl_t ctrl;
@@ -108,6 +121,7 @@ int main()
         nanosleep(&ts_poll, NULL);
     }
 
+finish:
     syslog(LOG_NOTICE, "Terminated");
     closelog();
 

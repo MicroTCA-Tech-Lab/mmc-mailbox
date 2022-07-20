@@ -8,12 +8,14 @@ add_library(mmcmb SHARED mmcmb.c)
 set_target_properties(mmcmb PROPERTIES PUBLIC_HEADER "mmcmb/mmcmb.h;mmcmb/fpga_mailbox_layout.h")
 set_target_properties(mmcmb PROPERTIES VERSION ${PROJECT_VERSION})
 
-# Invoke cmake with -DMAILBOX_FILE=/sys/bus/i2c/devices/5-002a/eeprom to adapt mailbox file path to the platform
-if(MAILBOX_FILE)
-    message(STATUS "Set mailbox file to ${MAILBOX_FILE}")
-    target_compile_definitions(mmcmb PRIVATE MB_DEVICE_FILE="${MAILBOX_FILE}")
-else()
-    message(FATAL_ERROR "Define mailbox file path, such as -DMAILBOX_FILE=/sys/bus/i2c/devices/5-002a/eeprom")
+# Invoke cmake with e.g. -DADAPTER_DT_NAME="iic_axi_iic_mmc" -DI2C_ADDR="002a" to override defaults
+if(ADAPTER_DT_NAME)
+    message(STATUS "Set adapter devicetree name to ${ADAPTER_DT_NAME}")
+    target_compile_definitions(mmcmb PRIVATE MB_ADAPTER_DT_NAME="${ADAPTER_DT_NAME}")
+endif()
+if(I2C_ADDR)
+    message(STATUS "Set mailbox I2C address to ${I2C_ADDR}")
+    target_compile_definitions(mmcmb PRIVATE MB_I2C_ADDR="${I2C_ADDR}")
 endif()
 
 install(TARGETS mmcmb

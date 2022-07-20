@@ -61,7 +61,7 @@ bool mb_get_mmc_information(mb_mmc_information_t* info)
 bool mb_get_mmc_sensors(mb_mmc_sensor_t* sen, size_t first_sensor, size_t n)
 {
     if (first_sensor + n > MAX_SENS_MMC) {
-        fprintf(stderr, "Sensor index out of range (%u > %u)\n", first_sensor + n, MAX_SENS_MMC);
+        fprintf(stderr, "Sensor index out of range (%zu > %zu)\n", first_sensor + n, MAX_SENS_MMC);
         return false;
     }
     return mb_read_at(MB_EEPROM_OFFS(mmc_sensor[first_sensor]), sen, sizeof(mb_mmc_sensor_t) * n);
@@ -70,7 +70,7 @@ bool mb_get_mmc_sensors(mb_mmc_sensor_t* sen, size_t first_sensor, size_t n)
 bool mb_get_fru_description(mb_fru_description_t* desc, size_t fru_id)
 {
     if (fru_id >= NUM_FRUS) {
-        fprintf(stderr, "FRU index out of range (%u >= %u)\n", fru_id, NUM_FRUS);
+        fprintf(stderr, "FRU index out of range (%zu >= %zu)\n", fru_id, NUM_FRUS);
         return false;
     }
     return mb_read_at(MB_EEPROM_OFFS(fru_information[fru_id].description),
@@ -81,7 +81,7 @@ bool mb_get_fru_description(mb_fru_description_t* desc, size_t fru_id)
 bool mb_get_fru_status(mb_fru_status_t* stat, size_t fru_id)
 {
     if (fru_id >= NUM_FRUS) {
-        fprintf(stderr, "FRU index out of range (%u >= %u)\n", fru_id, NUM_FRUS);
+        fprintf(stderr, "FRU index out of range (%zu >= %zu)\n", fru_id, NUM_FRUS);
         return false;
     }
     return mb_read_at(MB_EEPROM_OFFS(fru_information[fru_id].status),

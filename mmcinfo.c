@@ -55,7 +55,7 @@ static char* uptime_format(uint32_t t, char* buf, size_t len)
     return buf;
 }
 
-static void dump_str(const char* desc, size_t rjust, const char* str, size_t maxlen)
+static void dump_str(const char* desc, int rjust, const char* str, int maxlen)
 {
     printf("%-*s: %.*s\n", rjust, desc, maxlen, *str ? str : "N/A");
 }
@@ -97,7 +97,7 @@ static void dump_mmc_sensors(void)
     printf("MMC sensors\n");
     printf("-----------\n");
     for (size_t i = 0; i < MAX_SENS_MMC && sen[i].name[0]; i++) {
-        printf("%-13.*s: %g\n", sizeof(sen[i].name), sen[i].name, sen[i].reading);
+        printf("%-13.*s: %g\n", (int)sizeof(sen[i].name), sen[i].name, sen[i].reading);
     }
 }
 
@@ -108,7 +108,7 @@ static void dump_fru_description(size_t fru_id)
         exit(1);
     }
 
-    printf("FRU %d description\n", fru_id);
+    printf("FRU %zu description\n", fru_id);
     printf("-----------------\n");
 
     char uid_str[6 * 2 + 1] = "N/A";
@@ -139,7 +139,7 @@ static void dump_fru_status(size_t fru_id)
         exit(1);
     }
 
-    printf("FRU %d status\n", fru_id);
+    printf("FRU %zu status\n", fru_id);
     printf("-----------------\n");
 
     printf("%-14s: %cPresent %cCompatible %cPowered %cFailure\n",
@@ -150,7 +150,7 @@ static void dump_fru_status(size_t fru_id)
            stat.failure ? '+' : '-');
 
     for (size_t i = 0; i < stat.num_temp_sensors; i++) {
-        printf("Temperature %d : %g C\n", i + 1, (float)stat.temperature[i] / 100.f);
+        printf("Temperature %zu : %g C\n", i + 1, (float)stat.temperature[i] / 100.f);
     }
 }
 

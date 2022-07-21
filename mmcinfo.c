@@ -154,6 +154,15 @@ static void dump_fru_status(size_t fru_id)
     }
 }
 
+static bool fru_present(size_t fru_id)
+{
+    mb_fru_status_t stat;
+    if (!mb_get_fru_status(&stat, fru_id)) {
+        exit(1);
+    }
+    return stat.present;
+}
+
 int main(int argc, char** argv)
 {
     dump_mmc_information();
@@ -161,15 +170,14 @@ int main(int argc, char** argv)
     dump_mmc_sensors();
     printf("\n");
 
-    dump_fru_description(0);
-    printf("\n");
-    dump_fru_description(1);
-    printf("\n");
-    dump_fru_description(2);
-    printf("\n");
-
-    dump_fru_status(0);
-    printf("\n");
+    for (size_t fru_id = 0; fru_id < NUM_FRUS; fru_id++) {
+        if (fru_present(fru_id)) {
+            dump_fru_description(fru_id);
+            printf("\n");
+            dump_fru_status(fru_id);
+            printf("\n");
+        }
+    }
 
     mb_fpga_ctrl_t ctrl;
     if (mb_get_fpga_ctrl(&ctrl)) {

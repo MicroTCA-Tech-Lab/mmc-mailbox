@@ -20,6 +20,4 @@ bool mb_get_fru_description(mb_fru_description_t* desc, size_t fru_id);
 bool mb_get_fru_status(mb_fru_status_t* stat, size_t fru_id);
 bool mb_get_fpga_ctrl(mb_fpga_ctrl_t* ctrl);
 
-const char* mb_get_adapter_name(void);
-const char* mb_get_bus_name(void);
 const char* mb_get_eeprom_path(void);

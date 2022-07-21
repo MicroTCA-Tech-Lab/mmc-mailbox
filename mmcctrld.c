@@ -93,16 +93,12 @@ int main()
 {
     daemonize();
 
-    {
-        const char *adap, *bus, *eeprom;
-        if ((adap = mb_get_adapter_name()) != NULL && (bus = mb_get_bus_name()) != NULL &&
-            (eeprom = mb_get_eeprom_path()) != NULL) {
-            syslog(LOG_NOTICE, "Found adapter '%s' at %s", adap, bus);
-            syslog(LOG_NOTICE, "Using device file %s", eeprom);
-        } else {
-            syslog(LOG_ERR, "Could not open mailbox");
-            goto finish;
-        }
+    const char* eeprom = mb_get_eeprom_path();
+    if (eeprom != NULL) {
+        syslog(LOG_NOTICE, "Opened mailbox at %s", eeprom);
+    } else {
+        syslog(LOG_ERR, "Could not open mailbox");
+        goto finish;
     }
 
     const struct timespec ts_poll = {

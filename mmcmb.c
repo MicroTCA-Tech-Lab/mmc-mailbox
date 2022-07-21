@@ -23,29 +23,23 @@
 
 #include "mmcmb/fpga_mailbox_layout.h"
 
-#ifndef MB_ADAPTER_DT_NAME
-#define MB_ADAPTER_DT_NAME "iic_axi_iic_mmc"
+#ifndef MB_DT_COMPAT_ID
+#define MB_DT_COMPAT_ID "desy,mmcmailbox"
 #endif
 
-#ifndef MB_I2C_ADDR
-#define MB_I2C_ADDR "002a"
-#endif
-
-static int fd = -1;
-
-#define SYSFS_ADAPTERS "/sys/class/i2c-adapter"
+#define SYSFS_DEVICES "/sys/bus/i2c/devices"
+#define NODE_COMPATIBLE "of_node/compatible"
 #define I2CDIR_PREFIX "i2c-"
 #define I2CDIR_PREFIX_LEN (sizeof(I2CDIR_PREFIX) - 1)
 
-static char adapter_name[80];
-static char bus_name[20];
 static char eeprom_path[120];
+static int fd = -1;
 
-static bool get_i2c_adapter(const char* adapter_dt_name)
+static char* get_compatible_eeprom(const char* dt_compat_id)
 {
-    DIR* d = opendir(SYSFS_ADAPTERS);
+    DIR* d = opendir(SYSFS_DEVICES);
     if (!d) {
-        fprintf(stderr, "Could not list %s: %s\n", SYSFS_ADAPTERS, strerror(errno));
+        fprintf(stderr, "Could not list %s: %s\n", SYSFS_DEVICES, strerror(errno));
         return false;
     }
 
@@ -54,53 +48,55 @@ static bool get_i2c_adapter(const char* adapter_dt_name)
 
     while (!found && (dir = readdir(d)) != NULL) {
         // Can't check for DT_DIR as these pseudo-file dirs are not actual directories
-        // Just check if they begin with "i2c-"
-        if (strncmp(dir->d_name, I2CDIR_PREFIX, I2CDIR_PREFIX_LEN)) {
+        // Skip entries beginnig with "." or "i2c-"
+        if (dir->d_name[0] == '.' || !strncmp(dir->d_name, I2CDIR_PREFIX, I2CDIR_PREFIX_LEN)) {
             continue;
         }
 
-        // "i2c-" dir found, check adapter name
-        char namepath[28 + sizeof(dir->d_name)];  // avoid -Wformat-truncation
-        snprintf(namepath, sizeof(namepath), SYSFS_ADAPTERS "/%s/name", dir->d_name);
-        int name_fd = open(namepath, O_RDONLY);
-        if (name_fd < 0) {
-            continue;
-        }
-        int name_len = read(name_fd, adapter_name, sizeof(adapter_name) - 1);
-        close(name_fd);
-        if (name_len <= 0) {
-            continue;
-        }
-        adapter_name[name_len] = '\0';
-        adapter_name[strcspn(adapter_name, "\n")] = 0;
+        // Sysfs directory for I2C peripheral found, check adapter name
+        char comp_id_path[28 + sizeof(dir->d_name)];  // avoid -Wformat-truncation
+        snprintf(comp_id_path,
+                 sizeof(comp_id_path),
+                 SYSFS_DEVICES "/%s/" NODE_COMPATIBLE,
+                 dir->d_name);
 
-        if (strstr(adapter_name, adapter_dt_name)) {
+        int comp_id_fd = open(comp_id_path, O_RDONLY);
+        if (comp_id_fd < 0) {
+            continue;
+        }
+        char comp_id[80];
+        int comp_len = read(comp_id_fd, comp_id, sizeof(comp_id) - 1);
+        close(comp_id_fd);
+        if (comp_len <= 0) {
+            continue;
+        }
+        // DT compat. IDs are zero-terminated, but let's still terminate it just in case
+        comp_id[comp_len] = '\0';
+
+        if (!strcmp(comp_id, MB_DT_COMPAT_ID)) {
             found = true;
-            strncpy(bus_name, dir->d_name, sizeof(bus_name));
+            snprintf(eeprom_path, sizeof(eeprom_path), SYSFS_DEVICES "/%s/eeprom", dir->d_name);
         }
     }
     closedir(d);
-
-    return found;
+    return found ? eeprom_path : NULL;
 }
 
 static bool mb_open(void)
 {
-    if (!get_i2c_adapter(MB_ADAPTER_DT_NAME)) {
-        fprintf(stderr, "No adapter '%s' found\n", MB_ADAPTER_DT_NAME);
+    if (fd > 0) {
+        return true;
+    }
+
+    char* path = get_compatible_eeprom(MB_DT_COMPAT_ID);
+    if (!path) {
+        fprintf(stderr, "No I2C device compatible to '%s' found\n", MB_DT_COMPAT_ID);
         return false;
     }
 
-    snprintf(eeprom_path,
-             sizeof(eeprom_path),
-             SYSFS_ADAPTERS "/%s/%s-%s/eeprom",
-             bus_name,
-             bus_name + I2CDIR_PREFIX_LEN,
-             MB_I2C_ADDR);
-
-    fd = open(eeprom_path, O_RDWR);
+    fd = open(path, O_RDWR);
     if (fd < 0) {
-        fprintf(stderr, "Could not open %s: %s\n", eeprom_path, strerror(errno));
+        fprintf(stderr, "Could not open %s: %s\n", path, strerror(errno));
         return false;
     }
     return true;
@@ -118,16 +114,6 @@ static bool mb_read_at(size_t offs, void* buf, size_t n)
         return false;
     }
     return true;
-}
-
-const char* mb_get_adapter_name(void)
-{
-    return mb_open() ? adapter_name : NULL;
-}
-
-const char* mb_get_bus_name(void)
-{
-    return mb_open() ? bus_name : NULL;
 }
 
 const char* mb_get_eeprom_path(void)

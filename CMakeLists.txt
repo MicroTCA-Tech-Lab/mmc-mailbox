@@ -8,14 +8,10 @@ add_library(mmcmb SHARED mmcmb.c)
 set_target_properties(mmcmb PROPERTIES PUBLIC_HEADER "mmcmb/mmcmb.h;mmcmb/fpga_mailbox_layout.h")
 set_target_properties(mmcmb PROPERTIES VERSION ${PROJECT_VERSION})
 
-# Invoke cmake with e.g. -DADAPTER_DT_NAME="iic_axi_iic_mmc" -DI2C_ADDR="002a" to override defaults
-if(ADAPTER_DT_NAME)
-    message(STATUS "Set adapter devicetree name to ${ADAPTER_DT_NAME}")
-    target_compile_definitions(mmcmb PRIVATE MB_ADAPTER_DT_NAME="${ADAPTER_DT_NAME}")
-endif()
-if(I2C_ADDR)
-    message(STATUS "Set mailbox I2C address to ${I2C_ADDR}")
-    target_compile_definitions(mmcmb PRIVATE MB_I2C_ADDR="${I2C_ADDR}")
+# Invoke cmake with e.g. -DCOMPAT_ID="desy,mmcmailbox" to override default
+if(COMPAT_ID)
+    message(STATUS "Set mailbox compat. ID to ${COMPAT_ID}")
+    target_compile_definitions(mmcmb PRIVATE MB_DT_COMPAT_ID="${COMPAT_ID}")
 endif()
 
 install(TARGETS mmcmb

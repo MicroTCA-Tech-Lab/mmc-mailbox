@@ -101,6 +101,14 @@ int main()
         goto finish;
     }
 
+    const mb_fpga_status_t stat = {
+        .app_startup_finished = true,
+    };
+    if (!mb_set_fpga_status(&stat)) {
+        syslog(LOG_ERR, "Could not set FPGA status");
+        goto finish;
+    }
+
     const struct timespec ts_poll = {
         .tv_nsec = POLL_INTERVAL_MS * 1e6,
     };

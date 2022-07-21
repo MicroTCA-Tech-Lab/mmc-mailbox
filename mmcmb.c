@@ -116,6 +116,20 @@ static bool mb_read_at(size_t offs, void* buf, size_t n)
     return true;
 }
 
+static bool mb_write_at(size_t offs, const void* buf, size_t n)
+{
+    if (!mb_open()) {
+        return false;
+    }
+
+    ssize_t n_write = pwrite(fd, buf, n, offs);
+    if (n_write != n) {
+        perror("write error");
+        return false;
+    }
+    return true;
+}
+
 const char* mb_get_eeprom_path(void)
 {
     return mb_open() ? eeprom_path : NULL;
@@ -159,5 +173,10 @@ bool mb_get_fru_status(mb_fru_status_t* stat, size_t fru_id)
 
 bool mb_get_fpga_ctrl(mb_fpga_ctrl_t* ctrl)
 {
-    return mb_read_at(MB_EEPROM_OFFS(fpga_ctrl), ctrl, sizeof(mb_fpga_ctrl_t));
+    return mb_read_at(MB_EEPROM_OFFS(fpga_ctrl), ctrl, sizeof(*ctrl));
+}
+
+bool mb_set_fpga_status(const mb_fpga_status_t* stat)
+{
+    return mb_write_at(MB_EEPROM_OFFS(fpga_status), stat, sizeof(*stat));
 }

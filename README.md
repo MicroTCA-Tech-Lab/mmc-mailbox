@@ -7,7 +7,7 @@ It is implemented as a dual-port RAM on the DMMC-STAMP CPLD which emulates an `a
 The DMMC-STAMP provides following information on the mailbox:
 
 * MMC information (SW version, HW revision, slot number, etc)
-* MMC sensors
+* MMC sensors (names & readings)
 * For all FRUs:
     * Status (present, compatible, powered, error)
     * FRU information (vendor, product, serial number, etc) if available

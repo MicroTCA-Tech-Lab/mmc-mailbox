@@ -40,6 +40,7 @@ find_package(Python3 COMPONENTS Interpreter)
 # update memory layout .md from .ods spreadsheet
 add_custom_target(doc
     ${Python3_EXECUTABLE} "doc/ods2md/ods2md.py" "doc/mmc-fpga-data-interface.ods" > "doc/mmc-fpga-data-interface.md"
+    drawio -x "doc/mmc-mailbox.drawio" -o "doc/mmc-mailbox.svg"
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     COMMENT "Building documentation"
 )

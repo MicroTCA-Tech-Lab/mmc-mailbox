@@ -27,8 +27,8 @@ typedef struct mb_fru_status {
     unsigned failure : 1;
     unsigned status_reserved : 4;
     uint8_t num_temp_sensors;
-    uint16_t temperature[4];
-    uint8_t bytes_reserved[10];
+    uint16_t temperature[8];
+    uint8_t bytes_reserved[2];
 } MB_PACKED mb_fru_status_t;
 
 typedef struct mb_fru_description {

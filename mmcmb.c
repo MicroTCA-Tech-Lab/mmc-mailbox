@@ -32,7 +32,7 @@
 #define I2CDIR_PREFIX "i2c-"
 #define I2CDIR_PREFIX_LEN (sizeof(I2CDIR_PREFIX) - 1)
 
-static char eeprom_path[120];
+static char eeprom_path[290];
 static int fd = -1;
 
 static char* get_compatible_eeprom(const char* dt_compat_id)
@@ -54,7 +54,7 @@ static char* get_compatible_eeprom(const char* dt_compat_id)
         }
 
         // Sysfs directory for I2C peripheral found, check adapter name
-        char comp_id_path[28 + sizeof(dir->d_name)];  // avoid -Wformat-truncation
+        char comp_id_path[40 + sizeof(dir->d_name)];  // avoid -Wformat-truncation
         snprintf(comp_id_path,
                  sizeof(comp_id_path),
                  SYSFS_DEVICES "/%s/" NODE_COMPATIBLE,

@@ -1,0 +1,3 @@
+[submodule "doc/ods2md"]
+	path = doc/ods2md
+	url = git@github.com:patrislav1/ods2md.git

@@ -37,9 +37,11 @@ install(TARGETS mmcctrld DESTINATION ${CMAKE_INSTALL_SBINDIR})
 
 find_package(Python3 COMPONENTS Interpreter)
 
-# update memory layout .md from .ods spreadsheet
+# update .md & .svg from .ods & .drawio
 add_custom_target(doc
+    COMMAND
     ${Python3_EXECUTABLE} "doc/ods2md/ods2md.py" "doc/mmc-fpga-data-interface.ods" > "doc/mmc-fpga-data-interface.md"
+    COMMAND
     drawio -x "doc/mmc-mailbox.drawio" -o "doc/mmc-mailbox.svg"
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     COMMENT "Building documentation"

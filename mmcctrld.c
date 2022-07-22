@@ -31,7 +31,6 @@ static bool terminate = false;
 
 static void sigterm_handler(int signum)
 {
-    printf("Caught!\n");
     terminate = true;
 }
 

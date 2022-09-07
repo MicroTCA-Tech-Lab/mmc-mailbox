@@ -163,27 +163,103 @@ static bool fru_present(size_t fru_id)
     return stat.present;
 }
 
-int main(int argc, char** argv)
+typedef struct dump_enable {
+    bool mmc;
+    bool sensors;
+    bool fru[NUM_FRUS];
+    bool fpga;
+} dump_enable_t;
+
+static void lf(void)
 {
-    dump_mmc_information();
-    printf("\n");
-    dump_mmc_sensors();
-    printf("\n");
+    static bool first_call = true;
+    if (!first_call) {
+        printf("\n");
+    }
+    first_call = false;
+}
+
+static void dump_mmcmb(dump_enable_t en)
+{
+    if (en.mmc) {
+        lf();
+        dump_mmc_information();
+    }
+    if (en.sensors) {
+        lf();
+        dump_mmc_sensors();
+    }
 
     for (size_t fru_id = 0; fru_id < NUM_FRUS; fru_id++) {
-        if (fru_present(fru_id)) {
-            dump_fru_description(fru_id);
-            printf("\n");
-            dump_fru_status(fru_id);
-            printf("\n");
+        if (en.fru[fru_id]) {
+            if (fru_present(fru_id)) {
+                lf();
+                dump_fru_description(fru_id);
+                lf();
+                dump_fru_status(fru_id);
+            } else {
+                lf();
+                printf("FRU %zu not present\n", fru_id);
+                printf("-----------------\n");
+            }
         }
     }
 
-    mb_fpga_ctrl_t ctrl;
-    if (mb_get_fpga_ctrl(&ctrl)) {
-        printf("FPGA Ctrl: %cShdn %cPCIeReset\r\n",
-               ctrl.req_shutdown ? '+' : '-',
-               ctrl.req_pcie_reset ? '+' : '-');
+    if (en.fpga) {
+        mb_fpga_ctrl_t ctrl;
+        if (mb_get_fpga_ctrl(&ctrl)) {
+            lf();
+            printf("FPGA Ctrl: %cShdn %cPCIeReset\r\n",
+                   ctrl.req_shutdown ? '+' : '-',
+                   ctrl.req_pcie_reset ? '+' : '-');
+        }
     }
+}
+
+int main(int argc, char** argv)
+{
+    dump_enable_t en = {0};
+    const struct {
+        const char* opt;
+        bool* en;
+    } opt_map[] = {
+        {"mmc", &en.mmc},
+        {"sensors", &en.sensors},
+        {"fru0", &en.fru[0]},
+        {"fru1", &en.fru[1]},
+        {"fru2", &en.fru[2]},
+        {"fru3", &en.fru[3]},
+        {"amc", &en.fru[0]},
+        {"rtm", &en.fru[1]},
+        {"fmc1", &en.fru[2]},
+        {"fmc2", &en.fru[3]},
+        {"fpga", &en.fpga},
+    };
+    if (argc <= 1) {
+        // Dump all
+        en = (dump_enable_t){true, true, {true, true, true, true}, true};
+    } else {
+        for (size_t i = 1; i < argc; i++) {
+            bool opt_found = false;
+            for (size_t k = 0; k < (sizeof(opt_map) / sizeof(opt_map[0])); k++) {
+                if (!strcmp(argv[i], opt_map[k].opt)) {
+                    *opt_map[k].en = true;
+                    opt_found = true;
+                    break;
+                }
+            }
+            if (!opt_found) {
+                goto usage;
+            }
+        }
+    }
+
+    dump_mmcmb(en);
     return 0;
+
+usage:
+    fprintf(stderr,
+            "usage: %s [mmc] [sensors] [fru0..3] [amc] [rtm] [fmc1] [fmc2] [fpga]\r\n",
+            argv[0]);
+    return 1;
 }

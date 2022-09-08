@@ -20,6 +20,7 @@
 
 /* FPGA Mailbox data types */
 
+#define FRU_TEMP_INVALID 0x7fff
 typedef struct mb_fru_status {
     unsigned present : 1;
     unsigned compatible : 1;

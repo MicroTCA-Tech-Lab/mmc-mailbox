@@ -150,7 +150,12 @@ static void dump_fru_status(size_t fru_id)
            stat.failure ? '+' : '-');
 
     for (size_t i = 0; i < stat.num_temp_sensors; i++) {
-        printf("Temperature %zu : %g C\n", i + 1, (float)stat.temperature[i] / 100.f);
+        if (stat.temperature[i] != FRU_TEMP_INVALID) {
+            const float temp = (float)stat.temperature[i] / 100.f;
+            printf("Temperature %zu : %g C\n", i + 1, temp);
+        } else {
+            printf("Temperature %zu : N/A\n", i + 1);
+        }
     }
 }
 

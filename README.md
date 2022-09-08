@@ -4,6 +4,10 @@ The MMC mailbox is a data interface between the DMMC-STAMP and the AMC payload (
 
 It is implemented as a dual-port RAM on the DMMC-STAMP CPLD which emulates an `at24`-like I²C interface.
 
+## Scope
+
+This repository implements the userspace tools on the Linux side to access the mailbox, as well as a daemon to conduct an orderly Linux shutdown when a user pulls the hot swap handle of the AMC.
+
 The DMMC-STAMP provides following information on the mailbox:
 
 * MMC information (SW version, HW revision, slot number, etc)

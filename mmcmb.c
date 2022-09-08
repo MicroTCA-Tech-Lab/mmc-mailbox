@@ -32,6 +32,8 @@
 #define I2CDIR_PREFIX "i2c-"
 #define I2CDIR_PREFIX_LEN (sizeof(I2CDIR_PREFIX) - 1)
 
+#define MIN(X, Y) ((X) < (Y) ? (X) : (Y))
+
 static char eeprom_path[290] = {0};
 
 // Use separate fd's for read & write, so non-root users can do reads
@@ -176,6 +178,14 @@ bool mb_get_fru_status(mb_fru_status_t* stat, size_t fru_id)
     return mb_read_at(MB_EEPROM_OFFS(fru_information[fru_id].status),
                       stat,
                       sizeof(mb_fru_status_t));
+}
+
+bool mb_get_application_specific_data(void* buf, size_t offs, size_t len)
+{
+    const size_t d_size = MB_NUM_ELEMS(application_data);
+    offs = MIN(offs, d_size);
+    len = MIN(len, d_size - offs);
+    return mb_read_at(MB_EEPROM_OFFS(application_data[offs]), buf, len);
 }
 
 bool mb_get_fpga_ctrl(mb_fpga_ctrl_t* ctrl)

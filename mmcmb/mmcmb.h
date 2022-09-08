@@ -20,6 +20,8 @@ bool mb_get_mmc_sensors(mb_mmc_sensor_t* sen, size_t first_sensor, size_t n);
 bool mb_get_fru_description(mb_fru_description_t* desc, size_t fru_id);
 bool mb_get_fru_status(mb_fru_status_t* stat, size_t fru_id);
 
+bool mb_get_application_specific_data(void* buf, size_t offs, size_t len);
+
 bool mb_get_fpga_ctrl(mb_fpga_ctrl_t* ctrl);
 bool mb_set_fpga_status(const mb_fpga_status_t* stat);
 

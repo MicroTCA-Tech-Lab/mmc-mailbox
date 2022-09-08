@@ -90,6 +90,11 @@ void handle_fpga_ctrl(const mb_fpga_ctrl_t* ctrl)
 
 int main()
 {
+    if (geteuid() != 0) {
+        fprintf(stderr, "mmcctrld: needs to be launched with root privileges\r\n");
+        return 1;
+    }
+
     daemonize();
 
     const char* eeprom = mb_get_eeprom_path();

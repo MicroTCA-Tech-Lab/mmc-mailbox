@@ -32,11 +32,18 @@
 #define I2CDIR_PREFIX "i2c-"
 #define I2CDIR_PREFIX_LEN (sizeof(I2CDIR_PREFIX) - 1)
 
-static char eeprom_path[290];
-static int fd = -1;
+static char eeprom_path[290] = {0};
+
+// Use separate fd's for read & write, so non-root users can do reads
+static int fd_rdonly = -1;
+static int fd_wronly = -1;
 
 static char* get_compatible_eeprom(const char* dt_compat_id)
 {
+    if (eeprom_path[0] != '\0') {
+        return eeprom_path;
+    }
+
     DIR* d = opendir(SYSFS_DEVICES);
     if (!d) {
         fprintf(stderr, "Could not list %s: %s\n", SYSFS_DEVICES, strerror(errno));
@@ -82,9 +89,9 @@ static char* get_compatible_eeprom(const char* dt_compat_id)
     return found ? eeprom_path : NULL;
 }
 
-static bool mb_open(void)
+static bool mb_open(int* fd, int mode)
 {
-    if (fd > 0) {
+    if (*fd > 0) {
         return true;
     }
 
@@ -94,8 +101,8 @@ static bool mb_open(void)
         return false;
     }
 
-    fd = open(path, O_RDWR);
-    if (fd < 0) {
+    *fd = open(path, mode);
+    if (*fd < 0) {
         fprintf(stderr, "Could not open %s: %s\n", path, strerror(errno));
         return false;
     }
@@ -104,11 +111,11 @@ static bool mb_open(void)
 
 static bool mb_read_at(size_t offs, void* buf, size_t n)
 {
-    if (!mb_open()) {
+    if (!mb_open(&fd_rdonly, O_RDONLY)) {
         return false;
     }
 
-    ssize_t n_read = pread(fd, buf, n, offs);
+    ssize_t n_read = pread(fd_rdonly, buf, n, offs);
     if (n_read != n) {
         perror("read error");
         return false;
@@ -118,11 +125,11 @@ static bool mb_read_at(size_t offs, void* buf, size_t n)
 
 static bool mb_write_at(size_t offs, const void* buf, size_t n)
 {
-    if (!mb_open()) {
+    if (!mb_open(&fd_wronly, O_WRONLY)) {
         return false;
     }
 
-    ssize_t n_write = pwrite(fd, buf, n, offs);
+    ssize_t n_write = pwrite(fd_wronly, buf, n, offs);
     if (n_write != n) {
         perror("write error");
         return false;
@@ -132,7 +139,7 @@ static bool mb_write_at(size_t offs, const void* buf, size_t n)
 
 const char* mb_get_eeprom_path(void)
 {
-    return mb_open() ? eeprom_path : NULL;
+    return mb_open(&fd_rdonly, O_RDONLY) ? eeprom_path : NULL;
 }
 
 bool mb_get_mmc_information(mb_mmc_information_t* info)

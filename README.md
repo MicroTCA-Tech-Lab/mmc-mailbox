@@ -43,6 +43,7 @@ On the Linux software side, there are following components:
 
 ## Linux system shutdown
 
+This sequence diagram illustrates how the MMC mailbox is used to conduct the Linux shutdown:
 ```mermaid
 sequenceDiagram
     participant M as MCH
@@ -65,14 +66,10 @@ sequenceDiagram
 
 ## Example device tree configuration
 
-This example implements a Xilinx I2C interface connected to the DMMC-STAMP mailbox at I²C address 0x2a:
+This example `.dts` code sets up a DMMC-STAMP mailbox at I²C address 0x2a, connected to a Xilinx I2C interface named `iic_axi_iic_mmc`:
 
 ```dts
 &iic_axi_iic_mmc {
-  compatible = "xlnx,axi-iic-2.0", "xlnx,xps-iic-2.00.a";
-  clock-names = "s_axi_aclk";
-  clocks = <&zynqmp_clk 71>;
-
   mmcmailbox@2a {
       compatible = "desy,mmcmailbox";
       reg = <0x2a>;

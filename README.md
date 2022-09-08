@@ -8,6 +8,8 @@ It is implemented as a dual-port RAM on the DMMC-STAMP CPLD which emulates an `a
 
 This repository implements the userspace tools on the Linux side to access the mailbox, as well as a daemon to conduct an orderly Linux shutdown when a user pulls the hot swap handle of the AMC.
 
+## Mailbox contents
+
 The DMMC-STAMP provides following information on the mailbox:
 
 * MMC information (SW version, HW revision, slot number, etc)
@@ -20,6 +22,8 @@ The DMMC-STAMP provides following information on the mailbox:
 It also implements FPGA/SoC status and control flags that are primarily used to implement an orderly Linux shutdown when the MMC powers down the payload.
 
 There is a 256 byte area reserved for application-specific usage.
+
+See [memory map](doc/mmc-fpga-data-interface.md) for details.
 
 ## Locking
 
@@ -75,7 +79,3 @@ This example implements a Xilinx I2C interface connected to the DMMC-STAMP mailb
   };
 };
 ```
-
-## Memory map
-
-See [memory map table](doc/mmc-fpga-data-interface.md)

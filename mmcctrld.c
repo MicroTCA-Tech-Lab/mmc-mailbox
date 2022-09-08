@@ -104,6 +104,10 @@ int main()
         syslog(LOG_ERR, "Could not open mailbox");
         goto finish;
     }
+    if (!mb_check_magic()) {
+        syslog(LOG_ERR, "Mailbox not available");
+        goto finish;
+    }
 
     const mb_fpga_status_t stat = {
         .app_startup_finished = true,

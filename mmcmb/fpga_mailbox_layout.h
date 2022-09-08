@@ -10,6 +10,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#pragma once
+
 #include <stdint.h>
 
 #define MB_PACKED __attribute__((packed)) __attribute__((scalar_storage_order("little-endian")))
@@ -86,16 +88,20 @@ typedef struct mb_fpga_status {
 /* Full memory content, containing the sub-types */
 
 typedef struct mb_memory_contents {
+    char mailbox_magic_str[7];
+    uint8_t mailbox_version;
     mb_fru_information_t fru_information[4];
     uint8_t application_data[256];
     mb_mmc_information_t mmc_information;
     mb_mmc_sensor_t mmc_sensor[40];
-    uint8_t reserved[77];
+    uint8_t reserved[69];
     mb_fpga_ctrl_t fpga_ctrl;
     mb_fpga_status_t fpga_status;
 } MB_PACKED mb_memory_contents_t;
 
 #pragma GCC diagnostic pop
+
+#define MB_MAGIC_STR "MMCMBOX"
 
 /* Convenience macros */
 

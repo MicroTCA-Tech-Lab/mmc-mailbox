@@ -144,6 +144,16 @@ const char* mb_get_eeprom_path(void)
     return mb_open(&fd_rdonly, O_RDONLY) ? eeprom_path : NULL;
 }
 
+bool mb_check_magic(void)
+{
+    char magic_str_mb[MB_NUM_ELEMS(mailbox_magic_str)];
+
+    if (!mb_read_at(MB_EEPROM_OFFS(mailbox_magic_str), &magic_str_mb, sizeof(magic_str_mb))) {
+        return false;
+    }
+    return !memcmp(magic_str_mb, MB_MAGIC_STR, sizeof(magic_str_mb));
+}
+
 bool mb_get_mmc_information(mb_mmc_information_t* info)
 {
     return mb_read_at(MB_EEPROM_OFFS(mmc_information), info, sizeof(mb_mmc_information_t));

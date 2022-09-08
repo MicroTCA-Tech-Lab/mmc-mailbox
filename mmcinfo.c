@@ -259,6 +259,11 @@ int main(int argc, char** argv)
         }
     }
 
+    if (!mb_check_magic()) {
+        fprintf(stderr, "Mailbox not available\r\n");
+        return 1;
+    }
+
     dump_mmcmb(en);
     return 0;
 

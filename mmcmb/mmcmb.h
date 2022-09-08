@@ -16,6 +16,9 @@
 
 // Functions return true for success
 
+// Check MMC Mailbox magic string
+bool mb_check_magic(void);
+
 // Get MMC information
 bool mb_get_mmc_information(mb_mmc_information_t* info);
 

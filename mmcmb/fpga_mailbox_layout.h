@@ -56,7 +56,8 @@ typedef struct mb_version_number {
 typedef struct mb_mmc_information {
     mb_version_number_t application_version;
     mb_version_number_t library_version;
-    mb_version_number_t cpld_version;
+    mb_version_number_t cpld_board_version;
+    mb_version_number_t cpld_library_version;
     char stamp_hw_revision;
     uint8_t amc_slot_nr;
     uint8_t ipmb_addr;
@@ -64,7 +65,7 @@ typedef struct mb_mmc_information {
     uint16_t vendor_id;
     uint16_t product_id;
     uint32_t mmc_uptime;
-    uint8_t reserved[8];
+    uint8_t reserved[6];
 } MB_PACKED mb_mmc_information_t;
 
 typedef struct mb_mmc_sensor {

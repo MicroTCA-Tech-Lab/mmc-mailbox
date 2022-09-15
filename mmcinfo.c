@@ -74,7 +74,14 @@ static void dump_mmc_information(void)
            info.application_version.major,
            info.application_version.minor);
     printf("%-16s: %d.%d\n", "Lib version", info.library_version.major, info.library_version.minor);
-    printf("%-16s: %d.%d\n", "CPLD version", info.cpld_version.major, info.cpld_version.minor);
+    printf("%-16s: %d.%d\n",
+           "CPLD board ver.",
+           info.cpld_board_version.major,
+           info.cpld_board_version.minor);
+    printf("%-16s: %d.%d\n",
+           "CPLD lib ver.",
+           info.cpld_library_version.major,
+           info.cpld_library_version.minor);
 
     printf("%-16s: Rev. %c\n", "STAMP revision", info.stamp_hw_revision);
     printf("%-16s: %d\n", "AMC slot", info.amc_slot_nr);

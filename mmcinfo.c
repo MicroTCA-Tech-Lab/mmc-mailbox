@@ -158,7 +158,7 @@ static void dump_fru_status(size_t fru_id)
 
     // Dump FMC-specific flags if applicable
     if (stat.present && stat.powered && (fru_id == 2 || fru_id == 3)) {
-        printf("%-14s: Type: %s, ClkDir: %s, PG_M2C: %s",
+        printf("%-14s: Type: %s, ClkDir: %s, PG_M2C: %s\n",
                "FMC status",
                !stat.ext.fmc.hspc_prsnt ? "FMC+" : "FMC",
                stat.ext.fmc.clk_dir ? "C2M" : "M2C",

@@ -40,7 +40,7 @@
 |                 | 0      | 1    | Bitfield        | Status                   | Bit 4..7: Reserved<br>Bit 3: FRU Failure<br>Bit 2: FRU Payload Power Active<br>Bit 1: FRU Compatible<br>Bit 0: FRU Present                      |
 |                 | 1      | 1    | u8              | Num. Temperature Sensors | 0..8                                                                                                                                            |
 |                 | 2      | 16   | s16 []          | Temperature #1..#8       | Deg.C in 0.01° increments, 0x7fff if N/A or read error                                                                                          |
-|                 | 18     | 2    | None            | Reserved                 |                                                                                                                                                 |
+|                 | 18     | 2    | None            | FRU-type specific        | For FMCs:<br>Bit 3..15: Reserved<br>Bit 2: PG_M2C<br>Bit 1: CLK_DIR<br>Bit 0: HSPC_PRSNT (always 1 for non-FMC+ slots)                          |
 | Size:           | 20     |      |                 |                          |                                                                                                                                                 |
 
 <br>

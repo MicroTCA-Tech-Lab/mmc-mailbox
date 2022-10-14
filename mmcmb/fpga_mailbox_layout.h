@@ -32,7 +32,16 @@ typedef struct mb_fru_status {
     unsigned status_reserved : 4;
     uint8_t num_temp_sensors;
     uint16_t temperature[8];
-    uint8_t bytes_reserved[2];
+    union stat_ext {
+        uint8_t bytes_reserved[2];
+        struct stat_fmc {
+            unsigned hspc_prsnt : 1;
+            unsigned clk_dir : 1;
+            unsigned pg_m2c : 1;
+            unsigned reserved_1 : 5;
+            uint8_t reserved_2;
+        } MB_PACKED fmc;
+    } MB_PACKED ext;
 } MB_PACKED mb_fru_status_t;
 
 typedef struct mb_fru_description {

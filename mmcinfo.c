@@ -156,6 +156,15 @@ static void dump_fru_status(size_t fru_id)
            stat.powered ? '+' : '-',
            stat.failure ? '+' : '-');
 
+    // Dump FMC-specific flags if applicable
+    if (stat.present && stat.powered && (fru_id == 2 || fru_id == 3)) {
+        printf("%-14s: Type: %s, ClkDir: %s, PG_M2C: %s",
+               "FMC status",
+               !stat.ext.fmc.hspc_prsnt ? "FMC+" : "FMC",
+               stat.ext.fmc.clk_dir ? "C2M" : "M2C",
+               stat.ext.fmc.pg_m2c ? "asserted" : "deasserted");
+    }
+
     for (size_t i = 0; i < stat.num_temp_sensors; i++) {
         if (stat.temperature[i] != FRU_TEMP_INVALID) {
             const float temp = (float)stat.temperature[i] / 100.f;

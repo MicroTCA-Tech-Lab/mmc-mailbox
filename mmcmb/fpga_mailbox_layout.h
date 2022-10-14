@@ -12,6 +12,7 @@
 
 #pragma once
 
+#include <assert.h>
 #include <stdint.h>
 
 #define MB_PACKED __attribute__((packed)) __attribute__((scalar_storage_order("little-endian")))
@@ -115,3 +116,20 @@ typedef struct mb_memory_contents {
 #define NUM_FRUS MB_NUM_ELEMS(fru_information)
 #define MAX_SENS_PER_FRU MB_NUM_ELEMS(fru_information[0].status.temperature)
 #define MAX_SENS_MMC MB_NUM_ELEMS(mmc_sensor)
+
+/* Check MMC mailbox (minus lock register) total size */
+static_assert(sizeof(mb_memory_contents_t) == 2047, "Mailbox contents must be 2047 bytes");
+
+/* Check offsets for consistency with memory map, see doc/mmc-fpga-data-interface.md */
+static_assert(MB_EEPROM_OFFS(mailbox_magic_str) == 0, "Offset of mailbox_magic_str incorrect");
+static_assert(MB_EEPROM_OFFS(mailbox_version) == 7, "Offset of mailbox_version incorrect");
+static_assert(MB_EEPROM_OFFS(fru_information[0]) == 8, "Offset of fru_information[0] incorrect");
+static_assert(MB_EEPROM_OFFS(fru_information[1]) == 264, "Offset of fru_information[1] incorrect");
+static_assert(MB_EEPROM_OFFS(fru_information[2]) == 520, "Offset of fru_information[2] incorrect");
+static_assert(MB_EEPROM_OFFS(fru_information[3]) == 776, "Offset of fru_information[3] incorrect");
+static_assert(MB_EEPROM_OFFS(application_data) == 1032, "Offset of application_data incorrect");
+static_assert(MB_EEPROM_OFFS(mmc_information) == 1288, "Offset of mmc_information incorrect");
+static_assert(MB_EEPROM_OFFS(mmc_sensor) == 1336, "Offset of mmc_sensor incorrect");
+static_assert(MB_EEPROM_OFFS(reserved) == 1976, "Offset of reserved incorrect");
+static_assert(MB_EEPROM_OFFS(fpga_ctrl) == 2045, "Offset of fpga_ctrl incorrect");
+static_assert(MB_EEPROM_OFFS(fpga_status) == 2046, "Offset of fpga_status incorrect");

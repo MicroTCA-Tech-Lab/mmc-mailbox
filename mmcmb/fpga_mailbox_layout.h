@@ -118,7 +118,7 @@ typedef struct mb_memory_contents {
 
 /* EEPROM offset of a data structure field */
 #define MB_MEM_DUMMY ((const mb_memory_contents_t*)NULL)
-#define MB_EEPROM_OFFS(x) (uintptr_t)(&MB_MEM_DUMMY->x)
+#define MB_EEPROM_OFFS(x) offsetof(mb_memory_contents_t, x)
 
 /* Array sizes */
 #define MB_NUM_ELEMS(x) (sizeof(MB_MEM_DUMMY->x) / sizeof(MB_MEM_DUMMY->x[0]))

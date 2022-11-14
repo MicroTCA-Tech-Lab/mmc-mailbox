@@ -12,6 +12,12 @@
 
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include <stddef.h>
+
 #include "fpga_mailbox_layout.h"
 
 // Functions return true for success
@@ -42,3 +48,7 @@ bool mb_set_fpga_status(const mb_fpga_status_t* stat);
 
 // Get mmc-mailbox "EEPROM" device path, returns NULL on error
 const char* mb_get_eeprom_path(void);
+
+#ifdef __cplusplus
+}
+#endif

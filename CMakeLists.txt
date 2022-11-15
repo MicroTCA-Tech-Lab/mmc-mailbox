@@ -14,7 +14,7 @@ if(COMPAT_ID)
 endif()
 
 add_library(mmcmb SHARED mmcmb.c)
-set_target_properties(mmcmb PROPERTIES PUBLIC_HEADER "mmcmb/mmcmb.h;mmcmb/fpga_mailbox_layout.h")
+set_target_properties(mmcmb PROPERTIES PUBLIC_HEADER "mmcmb/mmcmb.h;mmcmb/mmcmb.hpp;mmcmb/fpga_mailbox_layout.h")
 set_target_properties(mmcmb PROPERTIES VERSION ${PROJECT_VERSION})
 
 install(TARGETS mmcmb

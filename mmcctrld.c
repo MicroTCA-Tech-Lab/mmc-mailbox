@@ -31,6 +31,7 @@ static bool terminate = false;
 
 static void sigterm_handler(int signum)
 {
+    (void)signum;
     terminate = true;
 }
 
@@ -66,7 +67,11 @@ static void daemonize()
     }
 
     umask(0);
-    chdir("/");
+
+    if (chdir("/") < 0) {
+        perror("chdir");
+        exit(EXIT_FAILURE);
+    }
 
     for (int x = sysconf(_SC_OPEN_MAX); x >= 0; x--) {
         close(x);

@@ -82,7 +82,7 @@ static char* get_compatible_eeprom(const char* dt_compat_id)
         // DT compat. IDs are zero-terminated, but let's still terminate it just in case
         comp_id[comp_len] = '\0';
 
-        if (!strcmp(comp_id, MB_DT_COMPAT_ID)) {
+        if (!strcmp(comp_id, dt_compat_id)) {
             found = true;
             snprintf(eeprom_path, sizeof(eeprom_path), SYSFS_DEVICES "/%s/eeprom", dir->d_name);
         }
@@ -118,7 +118,7 @@ static bool mb_read_at(size_t offs, void* buf, size_t n)
     }
 
     ssize_t n_read = pread(fd_rdonly, buf, n, offs);
-    if (n_read != n) {
+    if (n_read != (ssize_t)n) {
         perror("read error");
         return false;
     }
@@ -132,7 +132,7 @@ static bool mb_write_at(size_t offs, const void* buf, size_t n)
     }
 
     ssize_t n_write = pwrite(fd_wronly, buf, n, offs);
-    if (n_write != n) {
+    if (n_write != (ssize_t)n) {
         perror("write error");
         return false;
     }

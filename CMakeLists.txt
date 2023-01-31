@@ -16,6 +16,7 @@ endif()
 add_library(mmcmb SHARED mmcmb.c)
 set_target_properties(mmcmb PROPERTIES PUBLIC_HEADER "mmcmb/mmcmb.h;mmcmb/mmcmb.hpp;mmcmb/fpga_mailbox_layout.h")
 set_target_properties(mmcmb PROPERTIES VERSION ${PROJECT_VERSION})
+target_compile_options(mmcmb PRIVATE -Wall -Wextra -O2)
 
 install(TARGETS mmcmb
     PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/mmcmb
@@ -25,12 +26,14 @@ install(TARGETS mmcmb
 
 add_executable(mmcinfo mmcinfo.c)
 target_link_libraries(mmcinfo mmcmb)
+target_compile_options(mmcinfo PRIVATE -Wall -Wextra -O2)
 install(TARGETS mmcinfo DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 # mmcctrld application (daemon)
 
 add_executable(mmcctrld mmcctrld.c)
 target_link_libraries(mmcctrld mmcmb)
+target_compile_options(mmcctrld PRIVATE -Wall -Wextra -O2)
 install(TARGETS mmcctrld DESTINATION ${CMAKE_INSTALL_SBINDIR})
 
 # documentation

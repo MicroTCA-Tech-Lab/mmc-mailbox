@@ -260,7 +260,7 @@ int main(int argc, char** argv)
         // Dump all
         en = (dump_enable_t){true, true, {true, true, true, true}, true};
     } else {
-        for (size_t i = 1; i < argc; i++) {
+        for (int i = 1; i < argc; i++) {
             bool opt_found = false;
             for (size_t k = 0; k < (sizeof(opt_map) / sizeof(opt_map[0])); k++) {
                 if (!strcmp(argv[i], opt_map[k].opt)) {

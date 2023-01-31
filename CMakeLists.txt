@@ -1,8 +1,9 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.15)
 
 project(mmc-mailbox VERSION 1.0.0)
 
 include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
 
 # mmcmb library
 
@@ -18,9 +19,26 @@ set_target_properties(mmcmb PROPERTIES PUBLIC_HEADER "mmcmb/mmcmb.h;mmcmb/mmcmb.
 set_target_properties(mmcmb PROPERTIES VERSION ${PROJECT_VERSION})
 target_compile_options(mmcmb PRIVATE -Wall -Wextra -O2)
 
+configure_package_config_file(mmcmb-config.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/mmcmb-config.cmake
+    INSTALL_DESTINATION ${LIB_INSTALL_DIR}/cmake/mmcmb
+    PATH_VARS CMAKE_INSTALL_LIBDIR CMAKE_INSTALL_INCLUDEDIR
+)
+write_basic_package_version_file(
+    ${CMAKE_CURRENT_BINARY_DIR}/mmcmb-config-version.cmake
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY SameMajorVersion
+)
+
 install(TARGETS mmcmb
     PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/mmcmb
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
+install(FILES
+    "${CMAKE_CURRENT_BINARY_DIR}/mmcmb-config.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/mmcmb-config-version.cmake"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/mmcmb"
+)
 
 # mmcinfo application
 

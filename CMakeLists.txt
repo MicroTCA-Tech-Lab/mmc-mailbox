@@ -7,17 +7,17 @@ include(CMakePackageConfigHelpers)
 
 # mmcmb library
 
+add_library(mmcmb SHARED mmcmb.c)
+set_target_properties(mmcmb PROPERTIES PUBLIC_HEADER "mmcmb/mmcmb.h;mmcmb/mmcmb.hpp;mmcmb/fpga_mailbox_layout.h")
+set_target_properties(mmcmb PROPERTIES VERSION ${PROJECT_VERSION})
+target_compile_options(mmcmb PRIVATE -Wall -Wextra -O2)
+
 # COMPAT_ID is the device tree "compatible=" identifier for the mailbox device
 # Invoke cmake with e.g. -DCOMPAT_ID="desy,mmcmailbox" to override the default
 if(COMPAT_ID)
     message(STATUS "Set mailbox compat. ID to ${COMPAT_ID}")
     target_compile_definitions(mmcmb PRIVATE MB_DT_COMPAT_ID="${COMPAT_ID}")
 endif()
-
-add_library(mmcmb SHARED mmcmb.c)
-set_target_properties(mmcmb PROPERTIES PUBLIC_HEADER "mmcmb/mmcmb.h;mmcmb/mmcmb.hpp;mmcmb/fpga_mailbox_layout.h")
-set_target_properties(mmcmb PROPERTIES VERSION ${PROJECT_VERSION})
-target_compile_options(mmcmb PRIVATE -Wall -Wextra -O2)
 
 configure_package_config_file(mmcmb-config.cmake.in
     ${CMAKE_CURRENT_BINARY_DIR}/mmcmb-config.cmake

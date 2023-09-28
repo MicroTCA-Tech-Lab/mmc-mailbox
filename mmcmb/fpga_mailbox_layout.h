@@ -14,6 +14,7 @@
 
 #include <assert.h>
 #include <stdint.h>
+#include <stddef.h>
 
 #define MB_PACKED __attribute__((packed)) __attribute__((scalar_storage_order("little-endian")))
 
@@ -112,7 +113,7 @@ typedef struct mb_memory_contents {
     mb_mmc_information_t mmc_information;
     mb_mmc_sensor_t mmc_sensor[40];
     uint8_t reserved[43];
-    mb_nic_information_t bp_eth_information;
+    mb_nic_information_t bp_eth_info;
     mb_fpga_ctrl_t fpga_ctrl;
     mb_fpga_status_t fpga_status;
 } MB_PACKED mb_memory_contents_t;
@@ -147,6 +148,6 @@ static_assert(MB_EEPROM_OFFS(application_data) == 1032, "Offset of application_d
 static_assert(MB_EEPROM_OFFS(mmc_information) == 1288, "Offset of mmc_information incorrect");
 static_assert(MB_EEPROM_OFFS(mmc_sensor) == 1336, "Offset of mmc_sensor incorrect");
 static_assert(MB_EEPROM_OFFS(reserved) == 1976, "Offset of reserved incorrect");
-static_assert(MB_EEPROM_OFFS(bp_eth_information) == 2019, "Offset of NIC information incorrect");
+static_assert(MB_EEPROM_OFFS(bp_eth_info) == 2019, "Offset of NIC information incorrect");
 static_assert(MB_EEPROM_OFFS(fpga_ctrl) == 2045, "Offset of fpga_ctrl incorrect");
 static_assert(MB_EEPROM_OFFS(fpga_status) == 2046, "Offset of fpga_status incorrect");

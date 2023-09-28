@@ -5,6 +5,10 @@ project(mmc-mailbox VERSION 1.0.2)
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED TRUE)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # mmcmb library
 
 add_library(mmcmb SHARED mmcmb.c)

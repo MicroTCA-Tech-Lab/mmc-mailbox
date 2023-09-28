@@ -10,6 +10,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include "mmcmb/mmcmb.h"
+
 #include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -206,4 +208,9 @@ bool mb_get_fpga_ctrl(mb_fpga_ctrl_t* ctrl)
 bool mb_set_fpga_status(const mb_fpga_status_t* stat)
 {
     return mb_write_at(MB_EEPROM_OFFS(fpga_status), stat, sizeof(*stat));
+}
+
+bool mb_set_bp_eth_info(const mb_nic_information_t* nic_info)
+{
+    return mb_write_at(MB_EEPROM_OFFS(bp_eth_info), nic_info, sizeof(*nic_info));
 }

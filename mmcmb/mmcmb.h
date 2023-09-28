@@ -16,6 +16,7 @@
 extern "C" {
 #endif
 
+#include <stdbool.h>
 #include <stddef.h>
 
 #include "fpga_mailbox_layout.h"
@@ -45,6 +46,9 @@ bool mb_get_fpga_ctrl(mb_fpga_ctrl_t* ctrl);
 
 // Set FPGA status
 bool mb_set_fpga_status(const mb_fpga_status_t* stat);
+
+// Set Backplane NIC addresses
+bool mb_set_bp_eth_info(const mb_nic_information_t* nic_info);
 
 // Get mmc-mailbox "EEPROM" device path, returns NULL on error
 const char* mb_get_eeprom_path(void);

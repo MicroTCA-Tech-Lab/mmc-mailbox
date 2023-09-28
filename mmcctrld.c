@@ -11,17 +11,23 @@
  ***************************************************************************/
 
 #include <errno.h>
+#include <net/if.h>
+#include <netinet/in.h>
 #include <signal.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/ioctl.h>
+#include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <syslog.h>
 #include <time.h>
 #include <unistd.h>
+#include <ifaddrs.h>
 
+#include "mmcmb/fpga_mailbox_layout.h"
 #include "mmcmb/mmcmb.h"
 
 // Poll FPGA control register 4 times per second.
@@ -93,6 +99,48 @@ void handle_fpga_ctrl(const mb_fpga_ctrl_t* ctrl)
     terminate = true;
 }
 
+mb_nic_information_t get_nic_info(const char* ifname)
+{
+    mb_nic_information_t result = {0};
+
+    // Get MAC address via ioctl
+    int fd = socket(AF_INET, SOCK_DGRAM, 0);
+    if (fd > 0) {
+        struct ifreq ifr;
+        ifr.ifr_addr.sa_family = AF_INET;
+        strncpy(ifr.ifr_name, ifname, IFNAMSIZ - 1);
+        if (ioctl(fd, SIOCGIFHWADDR, &ifr) == 0) {
+            const uint8_t* mac_addr = (const uint8_t*)&ifr.ifr_ifru.ifru_hwaddr.sa_data[0];
+            memcpy(result.mac_addr, mac_addr, sizeof(result.mac_addr));
+        } else {
+            syslog(LOG_ERR, "Could not get MAC address of %s: %s", ifname, strerror(errno));
+        }
+        close(fd);
+    }
+
+    // Get primary IPv4 & IPv6 addresses via getifaddrs()
+    struct ifaddrs *ifap, *ifa;
+    getifaddrs(&ifap);
+    for (ifa = ifap; ifa; ifa = ifa->ifa_next) {
+        if (ifa->ifa_addr && !strcmp(ifa->ifa_name, ifname)) {
+            switch (ifa->ifa_addr->sa_family) {
+                case AF_INET: {
+                    const struct sockaddr_in* sa = (struct sockaddr_in*)ifa->ifa_addr;
+                    memcpy(result.ipv4_addr, &sa->sin_addr, sizeof(result.ipv4_addr));
+                } break;
+                case AF_INET6: {
+                    const struct sockaddr_in6* sa = (struct sockaddr_in6*)ifa->ifa_addr;
+                    memcpy(result.ipv6_addr, sa->sin6_addr.s6_addr, sizeof(result.ipv6_addr));
+                } break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    return result;
+}
+
 int main()
 {
     if (geteuid() != 0) {
@@ -122,6 +170,11 @@ int main()
         goto finish;
     }
 
+    const char* bp_eth_ifname = getenv("BP_ETH_IFNAME");
+    if (!bp_eth_ifname) {
+        bp_eth_ifname = "eth0";
+    }
+
     const struct timespec ts_poll = {
         .tv_nsec = POLL_INTERVAL_MS * 1e6,
     };
@@ -135,6 +188,10 @@ int main()
             break;
         }
         handle_fpga_ctrl(&ctrl);
+
+        mb_nic_information_t nic_info = get_nic_info(bp_eth_ifname);
+        mb_set_bp_eth_info(&nic_info);
+
         nanosleep(&ts_poll, NULL);
     }
 

@@ -1,3 +1,4 @@
 /.vscode
 /build
 *.bkp
+/doc/*.ods#

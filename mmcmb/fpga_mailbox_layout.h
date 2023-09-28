@@ -96,6 +96,12 @@ typedef struct mb_fpga_status {
     unsigned reserved : 5;
 } MB_PACKED mb_fpga_status_t;
 
+typedef struct mb_nic_information {
+    uint8_t mac_addr[6];
+    uint8_t ipv4_addr[4];
+    uint8_t ipv6_addr[16];
+} MB_PACKED mb_nic_information_t;
+
 /* Full memory content, containing the sub-types */
 
 typedef struct mb_memory_contents {
@@ -105,7 +111,8 @@ typedef struct mb_memory_contents {
     uint8_t application_data[256];
     mb_mmc_information_t mmc_information;
     mb_mmc_sensor_t mmc_sensor[40];
-    uint8_t reserved[69];
+    uint8_t reserved[43];
+    mb_nic_information_t bp_eth_information;
     mb_fpga_ctrl_t fpga_ctrl;
     mb_fpga_status_t fpga_status;
 } MB_PACKED mb_memory_contents_t;
@@ -140,5 +147,6 @@ static_assert(MB_EEPROM_OFFS(application_data) == 1032, "Offset of application_d
 static_assert(MB_EEPROM_OFFS(mmc_information) == 1288, "Offset of mmc_information incorrect");
 static_assert(MB_EEPROM_OFFS(mmc_sensor) == 1336, "Offset of mmc_sensor incorrect");
 static_assert(MB_EEPROM_OFFS(reserved) == 1976, "Offset of reserved incorrect");
+static_assert(MB_EEPROM_OFFS(bp_eth_information) == 2019, "Offset of NIC information incorrect");
 static_assert(MB_EEPROM_OFFS(fpga_ctrl) == 2045, "Offset of fpga_ctrl incorrect");
 static_assert(MB_EEPROM_OFFS(fpga_status) == 2046, "Offset of fpga_status incorrect");

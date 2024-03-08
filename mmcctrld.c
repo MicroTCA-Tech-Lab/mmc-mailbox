@@ -11,6 +11,7 @@
  ***************************************************************************/
 
 #include <errno.h>
+#include <ifaddrs.h>
 #include <net/if.h>
 #include <netinet/in.h>
 #include <signal.h>
@@ -25,7 +26,10 @@
 #include <syslog.h>
 #include <time.h>
 #include <unistd.h>
-#include <ifaddrs.h>
+
+#ifdef ENABLE_SYSTEMD
+#include <systemd/sd-daemon.h>
+#endif
 
 #include "mmcmb/fpga_mailbox_layout.h"
 #include "mmcmb/mmcmb.h"
@@ -41,6 +45,7 @@ static void sigterm_handler(int signum)
     terminate = true;
 }
 
+#ifndef ENABLE_SYSTEMD
 static void daemonize()
 {
     pid_t pid = fork();
@@ -60,9 +65,6 @@ static void daemonize()
     };
     sigaction(SIGCHLD, &action, NULL);
     sigaction(SIGHUP, &action, NULL);
-
-    action.sa_handler = sigterm_handler;
-    sigaction(SIGTERM, &action, NULL);
 
     pid = fork();
 
@@ -85,6 +87,7 @@ static void daemonize()
 
     openlog("mmcctrld", LOG_PID, LOG_DAEMON);
 }
+#endif
 
 void handle_fpga_ctrl(const mb_fpga_ctrl_t* ctrl)
 {
@@ -145,10 +148,12 @@ int main()
 {
     if (geteuid() != 0) {
         fprintf(stderr, "mmcctrld: needs to be launched with root privileges\r\n");
-        return 1;
+        return EXIT_FAILURE;
     }
 
+#ifndef ENABLE_SYSTEMD
     daemonize();
+#endif
 
     const char* eeprom = mb_get_eeprom_path();
     if (eeprom != NULL) {
@@ -180,6 +185,16 @@ int main()
     };
 
     syslog(LOG_NOTICE, "Started");
+
+#ifdef ENABLE_SYSTEMD
+    sd_notify(0, "READY=1");
+#endif
+
+    struct sigaction action = {
+        .sa_handler = SIG_IGN,
+    };
+    action.sa_handler = sigterm_handler;
+    sigaction(SIGTERM, &action, NULL);
 
     while (!terminate) {
         mb_fpga_ctrl_t ctrl;

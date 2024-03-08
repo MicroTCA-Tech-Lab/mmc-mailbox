@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 
-project(mmc-mailbox VERSION 1.0.3)
+project(mmc-mailbox VERSION 1.0.4)
 
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
@@ -57,6 +57,23 @@ add_executable(mmcctrld mmcctrld.c)
 target_link_libraries(mmcctrld mmcmb)
 target_compile_options(mmcctrld PRIVATE -Wall -Wextra -O2)
 install(TARGETS mmcctrld DESTINATION ${CMAKE_INSTALL_SBINDIR})
+
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(SYSTEMD IMPORTED_TARGET libsystemd)
+if(SYSTEMD_FOUND)
+    if("${SYSTEMD_SERVICES_INSTALL_DIR}" STREQUAL "")
+        execute_process(COMMAND ${PKG_CONFIG_EXECUTABLE}
+                        --variable=systemdsystemunitdir systemd
+                        OUTPUT_VARIABLE SYSTEMD_SERVICES_INSTALL_DIR)
+        string(REGEX REPLACE "[ \t\n]+" "" SYSTEMD_SERVICES_INSTALL_DIR "${SYSTEMD_SERVICES_INSTALL_DIR}")
+    endif()
+    target_compile_definitions(mmcctrld PRIVATE ENABLE_SYSTEMD)
+    target_link_libraries(mmcctrld PkgConfig::SYSTEMD)
+    message(STATUS "systemd support enabled, will install the service at '${SYSTEMD_SERVICES_INSTALL_DIR}'")
+    install(FILES mmcctrld.service DESTINATION "${SYSTEMD_SERVICES_INSTALL_DIR}")
+else()
+    message(WARNING "systemd not found, disabling systemd support")
+endif()
 
 # documentation
 

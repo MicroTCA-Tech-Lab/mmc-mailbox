@@ -119,11 +119,17 @@ mb_nic_information_t get_nic_info(const char* ifname)
             syslog(LOG_ERR, "Could not get MAC address of %s: %s", ifname, strerror(errno));
         }
         close(fd);
+    } else {
+        syslog(LOG_ERR, "Error: socket(): %s", strerror(errno));
     }
 
     // Get primary IPv4 & IPv6 addresses via getifaddrs()
     struct ifaddrs *ifap, *ifa;
-    getifaddrs(&ifap);
+    if (getifaddrs(&ifap) < 0) {
+        syslog(LOG_ERR, "Error: getifaddrs(): %s", strerror(errno));
+        goto out;
+    }
+
     for (ifa = ifap; ifa; ifa = ifa->ifa_next) {
         if (ifa->ifa_addr && !strcmp(ifa->ifa_name, ifname)) {
             switch (ifa->ifa_addr->sa_family) {
@@ -140,7 +146,9 @@ mb_nic_information_t get_nic_info(const char* ifname)
             }
         }
     }
+    freeifaddrs(ifap);
 
+out:
     return result;
 }
 

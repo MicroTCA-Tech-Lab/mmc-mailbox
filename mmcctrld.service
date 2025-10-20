@@ -3,6 +3,7 @@ Description=MMC mailbox control daemon
 Documentation=https://github.com/MicroTCA-Tech-Lab/mmc-mailbox
 After=basic.target
 [Service]
+NotifyAccess=main
 Type=notify
 User=root
 Group=root

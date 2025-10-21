@@ -41,6 +41,9 @@ static bool terminate = false;
 
 static void sigterm_handler(int signum)
 {
+#ifdef ENABLE_SYSTEMD
+	sd_notify(0, "STOPPING=1\n");
+#endif
     (void)signum;
     terminate = true;
 }

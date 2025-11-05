@@ -90,7 +90,14 @@ static void dump_mmc_information(void)
     printf("%-16s: 0x%04x\n", "IANA Vendor ID", info.vendor_id);
     printf("%-16s: 0x%04x\n", "IANA Product ID", info.product_id);
 
-    char tmp[60];
+    char tmp[60] = {0};
+    if (info.amc_hw_revision) {
+        tmp[0] = info.amc_hw_revision;
+    } else {
+        strncpy(tmp, "N/A", sizeof(tmp));
+    }
+    printf("%-16s: %s\n", "AMC HW revision", tmp);
+
     printf("%-16s: %s\n", "Uptime", uptime_format(info.mmc_uptime, tmp, sizeof(tmp)));
 }
 

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 
-project(mmc-mailbox VERSION 1.2.0)
+project(mmc-mailbox VERSION 1.2.1)
 
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)

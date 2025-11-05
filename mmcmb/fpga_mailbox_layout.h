@@ -13,8 +13,8 @@
 #pragma once
 
 #include <assert.h>
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
 
 #define MB_PACKED __attribute__((packed)) __attribute__((scalar_storage_order("little-endian")))
 
@@ -23,6 +23,7 @@
 #pragma GCC diagnostic ignored "-Wpacked"
 
 /* FPGA Mailbox data types */
+/* Mailbox version: 3      */
 
 #define FRU_TEMP_INVALID 0x7fff
 typedef struct mb_fru_status {
@@ -76,7 +77,8 @@ typedef struct mb_mmc_information {
     uint16_t vendor_id;
     uint16_t product_id;
     uint32_t mmc_uptime;
-    uint8_t reserved[6];
+    char amc_hw_revision;
+    uint8_t reserved[5];
 } MB_PACKED mb_mmc_information_t;
 
 typedef struct mb_mmc_sensor {
